@@ -1,5 +1,29 @@
 import { Personagem } from "../Class/Personagem";
 
+// Mock de Util.randomizar
+jest.mock("../Util/Util", () => ({
+  Util: {
+    randomizar: jest.fn()
+        // Para treinarAtaque, treinarDefesa, descansar e desafiar
+        .mockImplementation((min: number, max: number) => {
+          if (min === 1 && max === 2) return 1; // Para o dado do desafiar
+          if (min === 50 && max === 100) return 60; // Vida do oponente
+          if (min === 10 && max === 20) return 10; // Ataque/Defesa do oponente
+          if (min === 15 && max === 30) return 20; // Para treinar/descansar
+          return min;
+        })
+  }
+}));
+
+// Mock do fakerBR
+jest.mock("../Main", () => ({
+  fakerBR: {
+    person: {
+      firstName: jest.fn().mockReturnValue("Oponente")
+    }
+  }
+}));
+
 describe("Classe Personagem", () => {
   let personagem: Personagem;
 
@@ -10,6 +34,11 @@ describe("Classe Personagem", () => {
     personagem.atributos.vida = 100;
     personagem.atributos.ataque = 10;
     personagem.atributos.defesa = 5;
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("Deve permitir treinar ataque e modificar os atributos corretamente", () => {
